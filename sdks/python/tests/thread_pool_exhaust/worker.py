@@ -18,10 +18,10 @@ async def lifespan():
     import asyncio
     from concurrent.futures import ThreadPoolExecutor
 
+    # the default default (hehe) executor is instantiated with ThreadPoolExecutor()
+    # which has max_workers = min(32, (os.cpu_count() or 1) + 4)
+    # 5 simulates a single core worker
     asyncio.get_running_loop().set_default_executor(
-        # the default default (hehe) executor is instantiated with ThreadPoolExecutor()
-        # which has max_workers = min(32, (os.cpu_count() or 1) + 4)
-        # 5 simulates a single core worker
         ThreadPoolExecutor(max_workers=5, thread_name_prefix="tiny-default-pool")
     )
     yield
@@ -31,7 +31,7 @@ def sync_code_i_dont_control():
     time.sleep(5)
 
 
-@hatchet.task(execution_timeout=timedelta(seconds=10))
+@hatchet.task()
 async def my_async_task_that_i_do_control(input: EmptyModel, ctx: Context) -> None:
     await asyncio.to_thread(sync_code_i_dont_control)
 
